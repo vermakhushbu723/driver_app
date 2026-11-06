@@ -215,6 +215,7 @@ class DeliveryOrder {
     this.pickup,
     this.delivery,
     this.failure,
+    this.otpRequired = true,
   });
 
   final String id;
@@ -227,8 +228,11 @@ class DeliveryOrder {
   final String slot;
   final PaymentType payment;
 
-  /// The dealer gives this to the rider to confirm the delivery.
+  /// A customer gives this to the rider to confirm the delivery.
   final String deliveryOtp;
+
+  /// Customers confirm with an OTP. A dealer's delivery is proved by the rider's photo instead.
+  final bool otpRequired;
   final List<StatusEvent> events;
   final String notes;
   final PickupRecord? pickup;
@@ -277,6 +281,7 @@ class DeliveryOrder {
     pickup: pickup ?? this.pickup,
     delivery: delivery ?? this.delivery,
     failure: failure ?? this.failure,
+    otpRequired: otpRequired,
   );
 
   Map<String, dynamic> toJson() => {
@@ -295,6 +300,7 @@ class DeliveryOrder {
     'pickup': pickup?.toJson(),
     'delivery': delivery?.toJson(),
     'failure': failure?.toJson(),
+    'otpRequired': otpRequired,
   };
 
   factory DeliveryOrder.fromJson(Map<String, dynamic> j) => DeliveryOrder(
@@ -313,6 +319,7 @@ class DeliveryOrder {
     pickup: j['pickup'] == null ? null : PickupRecord.fromJson(j['pickup'] as Map<String, dynamic>),
     delivery: j['delivery'] == null ? null : DeliveryRecord.fromJson(j['delivery'] as Map<String, dynamic>),
     failure: j['failure'] == null ? null : FailureRecord.fromJson(j['failure'] as Map<String, dynamic>),
+    otpRequired: j['otpRequired'] as bool? ?? true,
   );
 }
 

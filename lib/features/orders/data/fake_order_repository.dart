@@ -219,7 +219,7 @@ class FakeOrderRepository implements OrderRepository {
   @override
   Future<void> completeDelivery(String orderId, String otp, DeliveryRecord delivery) async {
     final existing = _read().where((o) => o.id == orderId).firstOrNull;
-    if (existing != null && existing.deliveryOtp != otp) {
+    if (existing != null && existing.otpRequired && existing.deliveryOtp != otp) {
       await fakeLatency();
       throw const AppException('Incorrect OTP. Ask the dealer to check the code in their app.');
     }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/network/api_client.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -371,7 +372,7 @@ class _CompleteDeliveryScreenState extends ConsumerState<CompleteDeliveryScreen>
   Future<void> _submit(DeliveryOrder order) async {
     if (!_formKey.currentState!.validate()) return;
     if (_photos.isEmpty) {
-      showMessage(context, 'Please take a photo of the delivered goods', isError: true);
+      showMessage(context, order.otpRequired ? 'Please take a photo of the delivered goods' : 'Take a photo of the delivered goods. It is the proof of delivery for dealers.', isError: true);
       return;
     }
     setState(() => _saving = true);
@@ -512,21 +513,25 @@ class _CompleteDeliveryScreenState extends ConsumerState<CompleteDeliveryScreen>
                 const SizedBox(height: 12),
                 PhotoField(photos: _photos, onChanged: (p) => setState(() => _photos = p)),
                 const SizedBox(height: 12),
+                if (!order.otpRequired)
+                  const NoticeBanner('No OTP is needed for a dealer. The photo is the proof of delivery.', icon: Icons.photo_camera_outlined)
+                else ...[
                 LabeledField(
-                  label: 'Delivery OTP from the dealer',
+                  label: 'Delivery OTP from the customer',
                   child: TextFormField(
                     controller: _otp,
                     keyboardType: TextInputType.number,
                     maxLength: 4,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     validator: (v) => v?.length == 4 ? null : 'Enter the 4-digit delivery OTP',
-                    decoration: InputDecoration(hintText: enterHint('Delivery OTP from the dealer'), counterText: ''),
+                    decoration: InputDecoration(hintText: enterHint('Delivery OTP from the customer'), counterText: ''),
                   ),
                 ),
-                const SizedBox(height: 8),
-                NoticeBanner(
-                  'Demo: the OTP for this order is ${order.deliveryOtp}. Riders won\'t see it once the dealer app is connected.',
-                ),
+                if (useFakeBackend) ...[
+                  const SizedBox(height: 8),
+                  NoticeBanner('Demo: the OTP for this order is ${order.deliveryOtp}.'),
+                ],
+                ],
                 const SizedBox(height: 12),
                 LoadingButton(label: 'Confirm delivery', loading: _saving, onPressed: () => _submit(order)),
               ],

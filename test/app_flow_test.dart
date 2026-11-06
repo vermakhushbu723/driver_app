@@ -118,14 +118,14 @@ void main() {
     await _tapText(tester, 'Collected in full');
     await _enter(tester, 'Receiver name (optional)', 'Dealer Owner');
     await _tapText(tester, 'Take photo');
-    await _enter(tester, 'Delivery OTP from the dealer', '0000');
+    await _enter(tester, 'Delivery OTP from the customer', '0000');
     await _tapText(tester, 'Confirm delivery');
     expect(find.textContaining('Incorrect OTP'), findsOneWidget);
 
     // Let the error message clear, as it sits over the button.
     await tester.pump(const Duration(seconds: 5));
     await _settle(tester);
-    await _enter(tester, 'Delivery OTP from the dealer', order.deliveryOtp);
+    await _enter(tester, 'Delivery OTP from the customer', order.deliveryOtp);
     await _tapText(tester, 'Confirm delivery');
     expect(find.text('Delivery completed'), findsWidgets);
     expect(find.text('Delivered'), findsOneWidget);

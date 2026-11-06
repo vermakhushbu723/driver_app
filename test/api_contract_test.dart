@@ -112,6 +112,7 @@ void main() {
     final assigned = (await orders.orders()).firstWhere((o) => o.id == codId);
     expect(assigned.status, DeliveryStatus.assigned);
     expect(assigned.deliveryOtp, isEmpty, reason: 'the rider must never see the OTP');
+    expect(assigned.otpRequired, isFalse, reason: 'a dealer gives no OTP');
     await orders.accept(codId);
     await advance(codId, 3);
     await orders.confirmPickup(codId, PickupRecord(loaded: const {'block-50': 5}, photos: [await photo()], at: DateTime.now(), remark: 'Loaded', location: const GeoPoint(19.1, 72.8)));
@@ -122,9 +123,10 @@ void main() {
 
     final delivered = {'block-50': 4};
     final collected = moving.amountDue(delivered);
-    DeliveryRecord record(double amount) => DeliveryRecord(delivered: delivered, receivedBy: 'Manager', photos: const [], at: DateTime.now(), remark: 'One short', location: const GeoPoint(19.13, 72.86), collected: amount, collectionMode: CollectionMode.cash);
-    await expectLater(orders.completeDelivery(codId, '0000', record(collected)), throwsA(isA<ApiException>()));
-    await orders.completeDelivery(codId, cod['deliveryOtp'] as String, record(collected));
+    final proof = [await photo()];
+    DeliveryRecord record(double amount, {bool withPhoto = true}) => DeliveryRecord(delivered: delivered, receivedBy: 'Manager', photos: withPhoto ? proof : const [], at: DateTime.now(), remark: 'One short', location: const GeoPoint(19.13, 72.86), collected: amount, collectionMode: CollectionMode.cash);
+    await expectLater(orders.completeDelivery(codId, '', record(collected, withPhoto: false)), throwsA(isA<ApiException>()), reason: 'a dealer delivery needs a photo');
+    await orders.completeDelivery(codId, '', record(collected));
     final done = (await orders.orders()).firstWhere((o) => o.id == codId);
     expect(done.status, DeliveryStatus.delivered);
     expect(done.delivery!.collected, collected);
