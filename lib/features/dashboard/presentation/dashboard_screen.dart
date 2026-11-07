@@ -57,8 +57,9 @@ class DashboardScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 12),
-            GridView.count(
-              crossAxisCount: 2,
+            // Two across on any phone, more in a wide browser window.
+            GridView.extent(
+              maxCrossAxisExtent: 200,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               mainAxisSpacing: 8,
