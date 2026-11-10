@@ -31,6 +31,7 @@ abstract final class Routes {
   static const attendance = '/attendance';
   static const salary = '/salary';
   static const incentives = '/incentives';
+  static const fuel = '/fuel';
 
   static const notifications = '/notifications';
   static const notificationSettings = '/notification-settings';

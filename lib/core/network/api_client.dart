@@ -96,12 +96,12 @@ class ApiClient {
 
   /// Sends a photo or document, and gives back where the server keeps it.
   /// Something already on the server is left as it is.
-  Future<String> upload(String path) async {
+  Future<String> upload(String path, {String filename = 'upload.jpg'}) async {
     if (path.startsWith('http')) return path;
     final Uint8List bytes = await XFile(path).readAsBytes();
     final request = http.MultipartRequest('POST', _uri('/uploads'))
       ..headers.addAll(_authHeader)
-      ..files.add(http.MultipartFile.fromBytes('file', bytes, filename: 'upload.jpg'));
+      ..files.add(http.MultipartFile.fromBytes('file', bytes, filename: filename));
     final body = await _send(() async => http.Response.fromStream(await _client.send(request)));
     return (body as Map<String, dynamic>)['url'] as String;
   }

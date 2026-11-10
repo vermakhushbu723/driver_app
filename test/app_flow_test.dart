@@ -184,6 +184,7 @@ void main() {
       Routes.attendance,
       Routes.salary,
       Routes.incentives,
+      Routes.fuel,
       Routes.notifications,
       Routes.notificationSettings,
       Routes.support,
@@ -237,6 +238,7 @@ void main() {
       Routes.newTicket,
       Routes.newReturn(ReturnType.damagedBags.name),
       Routes.changePassword,
+      Routes.fuel,
       Routes.completeDelivery(id),
       Routes.failDelivery(id),
     ];

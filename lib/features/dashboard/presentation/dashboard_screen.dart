@@ -92,6 +92,13 @@ class DashboardScreen extends ConsumerWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 10),
+            // Fuel the company pays for: the rider records a video at the pump, the office approves it.
+            OutlinedButton.icon(
+              onPressed: () => context.push(Routes.fuel),
+              icon: const Icon(Icons.local_gas_station_outlined),
+              label: const Text('Fuel top-up'),
+            ),
             const SectionTitle('Next deliveries'),
             if (pending.isEmpty) const Text('No pending deliveries.'),
             for (final order in pending.take(5))

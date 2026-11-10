@@ -8,6 +8,7 @@ import '../features/auth/presentation/auth_providers.dart';
 import '../features/auth/presentation/login_screens.dart';
 import '../features/collection/presentation/collection_screens.dart';
 import '../features/dashboard/presentation/dashboard_screen.dart';
+import '../features/fuel/presentation/fuel_screen.dart';
 import '../features/notifications/presentation/notifications_screen.dart';
 import '../features/orders/domain/delivery_order.dart';
 import '../features/orders/presentation/delivery_screens.dart';
@@ -117,6 +118,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       _page(Routes.attendance, (_) => const AttendanceScreen()),
       _page(Routes.salary, (_) => const SalaryScreen()),
       _page(Routes.incentives, (_) => const IncentivesScreen()),
+      _page(Routes.fuel, (_) => const FuelScreen()),
       _page(Routes.notifications, (_) => const NotificationsScreen()),
       _page(Routes.notificationSettings, (_) => const NotificationSettingsScreen()),
       _page(Routes.support, (_) => const SupportScreen()),

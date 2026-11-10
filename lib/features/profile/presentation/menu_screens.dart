@@ -87,6 +87,7 @@ final _sections = [
     _MenuItem('Check in / check out', Routes.attendance),
     _MenuItem('Salary', Routes.salary),
     _MenuItem('Incentives', Routes.incentives),
+    _MenuItem('Fuel top-up', Routes.fuel),
   ]),
   const _MenuSection(Icons.notifications_none, 'Notifications', [
     _MenuItem('All notifications', Routes.notifications),
