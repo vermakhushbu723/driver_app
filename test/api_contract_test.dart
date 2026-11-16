@@ -68,8 +68,8 @@ void main() {
     final auth = ApiAuthRepository(api);
     expect(await auth.currentRider(), isNull);
     await expectLater(auth.sendOtp('9812999999'), throwsA(isA<ApiException>()));
-    await auth.sendOtp('9000000001');
-    final rider = await auth.verifyOtp('9000000001', '123456');
+    final code = await auth.sendOtp('9000000001');
+    final rider = await auth.verifyOtp('9000000001', code!);
     expect(rider.name, isNotEmpty);
     expect((await auth.setOnDuty(true)).onDuty, isTrue);
     await auth.changePassword(current: 'Rider@1234', next: 'Rider@1234');

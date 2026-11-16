@@ -72,7 +72,8 @@ Future<void> _enter(WidgetTester tester, String label, String value) async {
 Future<void> _signIn(WidgetTester tester) async {
   await tester.enterText(find.byType(TextFormField), '9000000001');
   await _tapText(tester, 'Send OTP');
-  await tester.enterText(find.byType(TextField), '123456');
+  expect(find.byKey(const ValueKey('otp-message')), findsOneWidget, reason: 'the random OTP shows at the top');
+  await _tapText(tester, 'Use');
   await _tapText(tester, 'Verify and continue');
 }
 
@@ -138,7 +139,10 @@ void main() {
 
   testWidgets('the menu lists all twelve sections and opens a sub-menu', (tester) async {
     final container = await _pumpApp(tester);
-    unawaited(container.read(authControllerProvider.notifier).verifyOtp('9000000001', '123456'));
+    unawaited(() async {
+      final code = await container.read(authRepositoryProvider).sendOtp('9000000001');
+      await container.read(authControllerProvider.notifier).verifyOtp('9000000001', code!);
+    }());
     await _settle(tester);
     container.read(routerProvider).go(Routes.menu);
     await _settle(tester);
@@ -150,7 +154,10 @@ void main() {
 
   testWidgets('every screen opens on a small phone', (tester) async {
     final container = await _pumpApp(tester, size: const Size(1080, 1920), ratio: 3); // 360 x 640
-    unawaited(container.read(authControllerProvider.notifier).verifyOtp('9000000001', '123456'));
+    unawaited(() async {
+      final code = await container.read(authRepositoryProvider).sendOtp('9000000001');
+      await container.read(authControllerProvider.notifier).verifyOtp('9000000001', code!);
+    }());
     await _settle(tester);
     final orders = container.read(ordersProvider).value!;
     final id = orders.first.id;
@@ -228,7 +235,10 @@ void main() {
     }
 
     await settle();
-    unawaited(container.read(authControllerProvider.notifier).verifyOtp('9000000001', '123456'));
+    unawaited(() async {
+      final code = await container.read(authRepositoryProvider).sendOtp('9000000001');
+      await container.read(authControllerProvider.notifier).verifyOtp('9000000001', code!);
+    }());
     await settle();
 
     final router = container.read(routerProvider);

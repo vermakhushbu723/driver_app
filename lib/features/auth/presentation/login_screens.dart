@@ -12,6 +12,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/contact_launcher.dart';
 import '../../../core/utils/validators.dart';
 import '../../../core/widgets/common_widgets.dart';
+import '../../../core/widgets/otp_message.dart';
 import '../data/fake_auth_repository.dart';
 import 'auth_providers.dart';
 
@@ -58,7 +59,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         await ref.read(authControllerProvider.notifier).signInWithPassword(phone, _password.text);
         return;
       }
-      await ref.read(authRepositoryProvider).sendOtp(phone);
+      final code = await ref.read(authRepositoryProvider).sendOtp(phone);
+      ref.read(shownOtpProvider.notifier).show(phone, code);
       if (!mounted) return;
       setState(() => _loading = false);
       context.push(Routes.otp, extra: phone);
@@ -124,7 +126,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     const SizedBox(height: 8),
                     if (showDemoHint)
-                      const NoticeBanner('Demo: mobile $demoPhone, OTP $demoOtp, password $demoPassword.'),
+                      const NoticeBanner('Demo: mobile $demoPhone, password $demoPassword.'),
                     const SizedBox(height: 8),
                     TextButton.icon(
                       onPressed: () => ContactLauncher.call(AppConstants.supportPhone),
@@ -188,6 +190,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     try {
       // The router redirects away from this screen once the rider is set.
       await ref.read(authControllerProvider.notifier).verifyOtp(widget.phone, _otp.text);
+      ref.read(shownOtpProvider.notifier).clear();
     } catch (e) {
       if (!mounted) return;
       setState(() => _loading = false);
@@ -196,8 +199,10 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   }
 
   Future<void> _resend() async {
-    await ref.read(authRepositoryProvider).sendOtp(widget.phone);
+    final code = await ref.read(authRepositoryProvider).sendOtp(widget.phone);
     if (!mounted) return;
+    ref.read(shownOtpProvider.notifier).show(widget.phone, code);
+    _otp.clear();
     setState(_startTimer);
     showMessage(context, 'OTP sent again');
   }
@@ -205,11 +210,17 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
+    final shown = ref.watch(shownOtpProvider);
     return Scaffold(
       appBar: AppBar(),
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
+          // No SMS provider yet: the random OTP arrives as a message at the top.
+          if (shown != null && shown.phone == widget.phone) ...[
+            OtpMessage(code: shown.code, onUse: () => _otp.text = shown.code),
+            const SizedBox(height: 20),
+          ],
           Text('Enter OTP', style: text.headlineMedium),
           const SizedBox(height: 4),
           Text('We sent a 6-digit code to +91 ${widget.phone}.'),

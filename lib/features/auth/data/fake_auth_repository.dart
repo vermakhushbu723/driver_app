@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:crypto/crypto.dart';
 
@@ -7,7 +8,6 @@ import '../../../core/storage/local_store.dart';
 import '../domain/rider.dart';
 
 const demoPhone = '9000000001';
-const demoOtp = '123456';
 const demoPassword = 'Rider@1234';
 
 /// Only the demo rider exists until the Admin Panel can add riders.
@@ -56,15 +56,20 @@ class FakeAuthRepository implements AuthRepository {
   Future<Rider?> currentRider() async => _store.readMap(_sessionKey) == null ? null : _load();
 
   @override
-  Future<void> sendOtp(String phone) async {
+  Future<String?> sendOtp(String phone) async {
     await fakeLatency();
     if (phone != demoPhone) throw const AppException('This number is not registered. Please contact your admin.');
+    return _sentCodes[phone] = (Random.secure().nextInt(900000) + 100000).toString();
   }
+
+  /// The last code sent to each number. A new random one every time, like the server.
+  static final _sentCodes = <String, String>{};
 
   @override
   Future<Rider> verifyOtp(String phone, String otp) async {
     await fakeLatency();
-    if (otp != demoOtp) throw const AppException('Incorrect OTP. Please try again.');
+    if (_sentCodes[phone] == null || otp != _sentCodes[phone]) throw const AppException('Incorrect OTP. Please try again.');
+    _sentCodes.remove(phone);
     return _signIn(phone);
   }
 

@@ -62,7 +62,8 @@ class Rider {
 abstract interface class AuthRepository {
   Future<Rider?> currentRider();
 
-  Future<void> sendOtp(String phone);
+  /// Sends a new random OTP. Gives the code back while it is shown in the app instead of by SMS.
+  Future<String?> sendOtp(String phone);
 
   Future<Rider> verifyOtp(String phone, String otp);
 

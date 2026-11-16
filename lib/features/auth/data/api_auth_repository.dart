@@ -24,7 +24,7 @@ class ApiAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<void> sendOtp(String phone) => _api.post('/auth/rider/otp/send', {'phone': phone});
+  Future<String?> sendOtp(String phone) async => ((await _api.post('/auth/rider/otp/send', {'phone': phone})) as Map<String, dynamic>)['otp'] as String?;
 
   @override
   Future<Rider> verifyOtp(String phone, String otp) async => _signedIn(await _api.post('/auth/rider/otp/verify', {'phone': phone, 'otp': otp}));
